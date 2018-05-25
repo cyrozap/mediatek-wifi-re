@@ -14,7 +14,7 @@
 1. Install dependencies.
 2. Run `make` to generate the parser code used by `extract_fw.py`.
 3. Obtain the `WIFI_RAM_CODE*` binaries you're interested in. You can
-   find these on many MediaTek-based Android phones phone in the
+   find these on many MediaTek-based Android phones in the
    `/system/etc/firmware` directory, but if that doesn't work for you,
    you can also find these firmware files on the Internet--typically in
    the "vendor.zip" files posted by Android ROM developers. You can also
