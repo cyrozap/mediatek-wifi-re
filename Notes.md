@@ -1,6 +1,6 @@
 # Notes
 
-* Code is loaded by segment into different memory regions.
+* Code and data are loaded by segment into different memory regions.
 * The CPU architecture of the code portions is NDS32, which is
   consistent with other MediaTek WiFi chips.
 * Some code is obfuscated using what appears to be a simple cyclic XOR,
