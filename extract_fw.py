@@ -23,6 +23,9 @@ if __name__ == "__main__":
         header = fw.header_e
     elif fw.signature == "MTKW":
         header = fw.header_w
+    else:
+        print("Error: Unrecognized firmware signature \"{}\"".format(fw.signature), file=sys.stderr)
+        sys.exit(1)
     for i in range(len(header.fwdl_sections)):
         info = header.fwdl_sections[i]
 
