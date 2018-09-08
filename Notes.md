@@ -1,5 +1,12 @@
 # Notes
 
+* Kernel code is in `drivers/misc/mediatek/connectivity/wlan`.
+  * From there, interesting definitions are in
+    `./gen2/include/wlan_lib.h` and `./gen3/include/wlan_lib.h`.
+  * Firmware loading code is in `./gen2/common/wlan_lib.c` and
+    `./gen3/common/wlan_lib.c`.
+  * The kernel code for later SoCs generally accounts for more hardware
+    variations than the code for earlier SoCs.
 * Code and data are loaded by segment into different memory regions.
 * The CPU architecture of the code portions is NDS32, which is
   consistent with other MediaTek WiFi chips.
