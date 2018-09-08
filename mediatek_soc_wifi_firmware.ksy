@@ -24,7 +24,8 @@ types:
       - id: signature
         type: u4
       - id: crc
-        type: u4 # CRC calculated without first 8 bytes included
+        type: u4
+        doc: CRC calculated without first 8 bytes included
       - id: num_of_entries
         type: u4
       - id: major_number
@@ -59,7 +60,8 @@ types:
       - id: signature
         type: u4
       - id: crc
-        type: u4 # CRC calculated without first 8 bytes included
+        type: u4
+        doc: CRC calculated without first 8 bytes included
       - id: num_of_entries
         type: u4
       - id: reserved
