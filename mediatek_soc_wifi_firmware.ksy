@@ -22,7 +22,10 @@ types:
   firmware_divided_download_e:
     seq:
       - id: signature
-        type: u4
+        type: str
+        size: 4
+        encoding: ASCII
+        doc: This should equal "MTKE"
       - id: crc
         type: u4
         doc: CRC calculated without first 8 bytes included
@@ -58,7 +61,10 @@ types:
   firmware_divided_download_w:
     seq:
       - id: signature
-        type: u4
+        type: str
+        size: 4
+        encoding: ASCII
+        doc: This should equal "MTKW"
       - id: crc
         type: u4
         doc: CRC calculated without first 8 bytes included
