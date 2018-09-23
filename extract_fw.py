@@ -21,13 +21,10 @@ if __name__ == "__main__":
     fw_bytes = open(orig, 'rb').read()
     fw = mediatek_soc_wifi_firmware.MediatekSocWifiFirmware.from_bytes(fw_bytes)
     offset = 0
-    if fw.signature == "MTKE":
-        header = fw.header_e
-    elif fw.signature == "MTKW":
-        header = fw.header_w
-    else:
+    if fw.signature not in ("MTKE", "MTKW"):
         print("Error: Unrecognized firmware signature \"{}\"".format(fw.signature), file=sys.stderr)
         sys.exit(1)
+    header = fw.header
     calculated_crc = crc32(fw_bytes[8:])
     if calculated_crc != header.crc:
         print("CRC BAD: Expected 0x{:08x}, got 0x{:08x}.".format(header.crc, calculated_crc))

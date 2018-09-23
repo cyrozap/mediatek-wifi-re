@@ -4,12 +4,12 @@ meta:
   title: MediaTek SoC WiFi Firmware
   license: CC0-1.0
 seq:
-  - id: header_e
-    type: firmware_divided_download_e
-    if: signature == 'MTKE'
-  - id: header_w
-    type: firmware_divided_download_w
-    if: signature == 'MTKW'
+  - id: header
+    type:
+      switch-on: signature
+      cases:
+        '"MTKE"': firmware_divided_download_e
+        '"MTKW"': firmware_divided_download_w
   - id: body
     size-eos: true
 instances:
