@@ -20,7 +20,6 @@ if __name__ == "__main__":
 
     fw_bytes = open(orig, 'rb').read()
     fw = mediatek_soc_wifi_firmware.MediatekSocWifiFirmware.from_bytes(fw_bytes)
-    offset = 0
     if fw.signature not in ("MTKE", "MTKW"):
         print("Error: Unrecognized firmware signature \"{}\"".format(fw.signature), file=sys.stderr)
         sys.exit(1)
