@@ -25,7 +25,7 @@ types:
         contents: 'MTKE'
       - id: crc
         type: u4
-        doc: CRC calculated without first 8 bytes included
+        doc: CRC calculated without first 8 bytes included.
       - id: num_of_entries
         type: u4
       - id: major_number
@@ -61,7 +61,7 @@ types:
         contents: 'MTKW'
       - id: crc
         type: u4
-        doc: CRC calculated without first 8 bytes included
+        doc: CRC calculated without first 8 bytes included.
       - id: num_of_entries
         type: u4
       - id: reserved
