@@ -19,3 +19,18 @@
 * Since this code is called `WIFI_RAM_CODE*`, maybe the NDS32 core has
   a boot ROM that does the deobfuscation?
 * Maybe the NDS32 boot ROM can be dumped from the AP?
+* The [MT76x7 Technical Reference Manual][trm] (found [here][docs])
+  lists a "Patch Decryption Accelerator" (PDA) in the N9 CPU memory map,
+  so I'm probably partially correct in that the boot ROM performs the
+  firmware image parsing but the decryption is performed by dedicated
+  hardware.
+  * That said, just because the hardware is called a "decryption"
+    accelerator doesn't mean the decryption is actually
+    cryptographically secure, especially since there is already a
+    dedicated cryptography accelerator on the same bus and in this
+    context it wouldn't make sense to include two pieces of hardware
+    that have the same function.
+
+
+[trm]: https://labs.mediatek.com/en/download/6OPabr6H
+[docs]: https://docs.labs.mediatek.com/resource/mt7687-mt7697/en/documentation
