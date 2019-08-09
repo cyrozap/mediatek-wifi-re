@@ -4,14 +4,12 @@ meta:
   title: MediaTek SoC WiFi Firmware
   license: CC0-1.0
 seq:
-  - id: header
+  - id: firmware
     type:
       switch-on: signature
       cases:
         '"MTKE"': firmware_divided_download_e
         '"MTKW"': firmware_divided_download_w
-  - id: body
-    size-eos: true
 instances:
   signature:
     pos: 0
@@ -37,11 +35,11 @@ types:
       - id: reserved
         type: u4
       - id: fwdl_sections
-        type: fwdl_section_info
+        type: fwdl_section
         repeat: expr
         repeat-expr: num_of_entries
     types:
-      fwdl_section_info:
+      fwdl_section:
         seq:
           - id: offset
             type: u4
@@ -55,6 +53,11 @@ types:
             type: u4
           - id: dest_addr
             type: u4
+        instances:
+          data:
+            io: _root._io
+            pos: offset
+            size: length
   firmware_divided_download_w:
     seq:
       - id: signature
@@ -67,11 +70,11 @@ types:
       - id: reserved
         type: u4
       - id: fwdl_sections
-        type: fwdl_section_info
+        type: fwdl_section
         repeat: expr
         repeat-expr: num_of_entries
     types:
-      fwdl_section_info:
+      fwdl_section:
         seq:
           - id: offset
             type: u4
@@ -81,3 +84,8 @@ types:
             type: u4
           - id: dest_addr
             type: u4
+        instances:
+          data:
+            io: _root._io
+            pos: offset
+            size: length

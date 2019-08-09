@@ -23,21 +23,22 @@ if __name__ == "__main__":
     if fw.signature not in ("MTKE", "MTKW"):
         print("Error: Unrecognized firmware signature \"{}\"".format(fw.signature), file=sys.stderr)
         sys.exit(1)
-    header = fw.header
+    firmware = fw.firmware
     calculated_crc = crc32(fw_bytes[8:])
-    if calculated_crc != header.crc:
-        print("CRC BAD: Expected 0x{:08x}, got 0x{:08x}.".format(header.crc, calculated_crc))
+    if calculated_crc != firmware.crc:
+        print("CRC BAD: Expected 0x{:08x}, got 0x{:08x}.".format(firmware.crc, calculated_crc))
     else:
         print("CRC OK")
-    for i in range(len(header.fwdl_sections)):
-        info = header.fwdl_sections[i]
+    for i in range(len(firmware.fwdl_sections)):
+        section = firmware.fwdl_sections[i]
 
-        filename = "{}.file_idx_{}.dest_addr_{:02X}.{}".format(basename, i, info.dest_addr, ext)
-        section = fw.body[info.offset:info.offset+info.length]
+        filename = "{}.file_idx_{}.dest_addr_{:02X}.{}".format(basename, i, section.dest_addr, ext)
         if fw.signature == "MTKE":
-            if info.enc == 1:
-                key = e_keys[info.k_idx]
-                section = fw._io.process_xor_many(section, key)
+            if section.enc == 1:
+                key = e_keys[section.k_idx]
+                data = fw._io.process_xor_many(section.data, key)
+            else:
+                data = section.data
         elif fw.signature == "MTKW":
-            section = fw._io.process_xor_many(section, w_key)
-        open(filename, 'wb').write(section)
+            data = fw._io.process_xor_many(section.data, w_key)
+        open(filename, 'wb').write(data)
