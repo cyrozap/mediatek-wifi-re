@@ -25,7 +25,7 @@
   firmware image parsing but the decryption is performed by dedicated
   hardware.
   * That said, just because the hardware is called a "decryption"
-    accelerator doesn't mean the decryption is actually
+    accelerator doesn't necessarily mean the decryption is actually
     cryptographically secure, especially since there is already a
     dedicated cryptography accelerator on the same bus and in this
     context it wouldn't make sense to include two pieces of hardware
