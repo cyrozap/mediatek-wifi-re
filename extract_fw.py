@@ -8,10 +8,10 @@ from zlib import crc32
 import mediatek_soc_wifi_firmware
 
 e_keys = [
-    bytearray(16),
+    bytes.fromhex("B4 8D 13 6F E3 76 12 7C  C5 F9 1F B4 83 E9 D6 60".replace(' ','')),
 ]
 
-w_key = bytearray(16)
+w_key = bytes.fromhex("B4 8D 13 6F E3 76 12 7C  C5 F9 1F B4 83 E9 D6 60".replace(' ',''))
 
 if __name__ == "__main__":
     orig = sys.argv[1]
