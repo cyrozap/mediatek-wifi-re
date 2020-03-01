@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import binascii
 import struct
 import sys
@@ -14,7 +15,12 @@ e_keys = [
 w_key = bytes.fromhex("B4 8D 13 6F E3 76 12 7C  C5 F9 1F B4 83 E9 D6 60".replace(' ',''))
 
 if __name__ == "__main__":
-    orig = sys.argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input", type=str, help="Input file.")
+    #parser.add_argument("-o", "--output", type=str, help="Output file.")
+    args = parser.parse_args()
+
+    orig = args.input
     ext = "bin"
     basename = orig
 
