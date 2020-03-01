@@ -17,6 +17,9 @@ w_key = bytes.fromhex("B4 8D 13 6F E3 76 12 7C  C5 F9 1F B4 83 E9 D6 60".replace
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=str, help="Input file.")
+    parser.add_argument("-d", "--deobfs", dest="deobfsuscate", action="store_true", help="Deobfuscate the firmware, if necessary.")
+    parser.add_argument("-e", "--no-deobfs", dest="deobfsuscate", action="store_false", help="Don't deobfuscate the firmware, even if it's marked as obfuscated. (default behavior)")
+    parser.set_defaults(deobfsuscate=False)
     #parser.add_argument("-o", "--output", type=str, help="Output file.")
     args = parser.parse_args()
 
@@ -39,12 +42,12 @@ if __name__ == "__main__":
         section = firmware.fwdl_sections[i]
 
         filename = "{}.file_idx_{}.dest_addr_{:02X}.{}".format(basename, i, section.dest_addr, ext)
-        if fw.signature == "MTKE":
-            if section.enc == 1:
-                key = e_keys[section.k_idx]
-                data = fw._io.process_xor_many(section.data, key)
-            else:
-                data = section.data
-        elif fw.signature == "MTKW":
-            data = fw._io.process_xor_many(section.data, w_key)
+        data = section.data
+        if args.deobfsuscate:
+            if fw.signature == "MTKE":
+                if section.enc == 1:
+                    key = e_keys[section.k_idx]
+                    data = fw._io.process_xor_many(section.data, key)
+            elif fw.signature == "MTKW":
+                data = fw._io.process_xor_many(section.data, w_key)
         open(filename, 'wb').write(data)
