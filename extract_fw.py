@@ -8,11 +8,134 @@ from zlib import crc32
 
 import mediatek_soc_wifi_firmware
 
-e_keys = [
-    bytes.fromhex("B4 8D 13 6F E3 76 12 7C  C5 F9 1F B4 83 E9 D6 60".replace(' ','')),
-]
 
-w_key = bytes.fromhex("B4 8D 13 6F E3 76 12 7C  C5 F9 1F B4 83 E9 D6 60".replace(' ',''))
+# https://stackoverflow.com/a/9831671
+ONE_BITS = bytes(bin(x).count("1") for x in range(256))
+
+
+def xor(a, b):
+    '''XOR two byte arrays of equal length.'''
+
+    assert len(a) == len(b)
+
+    size = len(a)
+    q = bytearray(size)
+    for i in range(size):
+        q[i] = (a[i] ^ b[i]) & 0xff
+    return bytes(q)
+
+def bit_similarity(a):
+    '''Calculate the similarity of two byte arrays based on the result of their XOR.'''
+
+    a = bytes(a)
+    bitlen = len(a) * 8
+    ones = 0
+    for b in a:
+        ones += ONE_BITS[b]
+    return (bitlen - ones)/bitlen
+
+def find_ek_zero_consec(obfs_chunks):
+    '''Find the block most likely to be the encrypted zero block, by longest run of consecutive occurrences.'''
+
+    block_size = len(obfs_chunks[0])
+
+    stats = {}
+    prev_chunk = None
+    prev_run = None
+    for curr_chunk in obfs_chunks:
+        if curr_chunk == prev_chunk:
+            if curr_chunk not in stats.keys():
+                stats[curr_chunk] = []
+            if prev_run != curr_chunk:
+                stats[curr_chunk].append(0)
+            stats[curr_chunk][-1] += 1
+            prev_run = curr_chunk
+        prev_chunk = curr_chunk
+
+    highest = 0
+    highest_chunk = None
+    for (chunk, run_counts) in stats.items():
+        max_count = max(run_counts)
+        if max_count > highest:
+            highest = max_count
+            highest_chunk = chunk
+
+    if highest_chunk is None:
+        print("Error: Failed to find E_K(zeroes).")
+        return None
+
+    print("Found likeliest E_K(zeroes) \"{}\" with longest run {}.".format(highest_chunk.hex(), highest))
+
+    similarity = bit_similarity(xor(highest_chunk, bytes(bytearray(block_size))))
+    if similarity > 0.80 or similarity < 0.20:
+        print("Warning: Likeliest E_K(zeroes) doesn't appear random. Are you sure your firmware is obfuscated?")
+
+    return highest_chunk
+
+def find_ek_zero_freq(obfs_chunks):
+    '''Find the block most likely to be the encrypted zero block, by frequency.'''
+
+    counts = {}
+    for chunk in obfs_chunks:
+        if chunk not in counts.keys():
+            counts[chunk] = 0
+        counts[chunk] += 1
+
+    highest = 0
+    highest_chunk = None
+    for (chunk, count) in counts.items():
+        if count > highest:
+            highest = count
+            highest_chunk = chunk
+
+    print("Found likeliest E_K(zeroes) \"{}\" with frequency {}.".format(highest_chunk.hex(), highest))
+
+    return highest_chunk
+
+def deobfuscate(obfuscated, mode='consec'):
+    obfuscated = bytes(obfuscated)
+    block_size = 16
+    obfs_chunks = [obfuscated[i:i+block_size] for i in range(0, len(obfuscated), block_size)]
+    deobfs_chunks = obfs_chunks.copy()
+
+    if mode == 'consec':
+        ek_zero = find_ek_zero_consec(obfs_chunks)
+    elif mode == 'freq':
+        ek_zero = find_ek_zero_freq(obfs_chunks)
+    else:
+        print("Error: Unknown mode: {}".format(mode))
+        return None
+
+    if not ek_zero:
+        return None
+
+    ci_equals_ek_pi = set()
+    ek_pi_to_pi = {}
+    for chunk_i in range(2, len(obfs_chunks) - 1):
+        if obfs_chunks[chunk_i] == ek_zero:
+            # The plaintext of the 2nd previous chunk is XORed with the
+            # E_K(P_i) of the previous chunk.
+            plaintext_i2 = xor(obfs_chunks[chunk_i - 1], ek_zero)
+            deobfs_chunks[chunk_i - 2] = plaintext_i2
+
+            # Since we know the plaintext of the 2nd previous chunk, if we
+            # know its C_i is equal to its E_K(P_i), add the C_i/E_K(P_i) to
+            # a lookup table.
+            if (chunk_i - 2) in ci_equals_ek_pi:
+                ek_pi_to_pi[obfs_chunks[chunk_i - 2]] = plaintext_i2
+
+            # The previous chunk is all zeros.
+            deobfs_chunks[chunk_i - 1] = bytes(bytearray(block_size))
+
+            # The current chunk is all zeros (obviously).
+            deobfs_chunks[chunk_i] = bytes(bytearray(block_size))
+
+            # The next C_i is equal to its E_K(P_i).
+            if deobfs_chunks[chunk_i + 1] != ek_zero:
+                ci_equals_ek_pi.add(chunk_i + 1)
+
+    return b''.join(deobfs_chunks)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -44,10 +167,13 @@ if __name__ == "__main__":
         filename = "{}.file_idx_{}.dest_addr_{:02X}.{}".format(basename, i, section.dest_addr, ext)
         data = section.data
         if args.deobfsuscate:
+            deobfuscated = None
             if fw.signature == "MTKE":
                 if section.enc == 1:
-                    key = e_keys[section.k_idx]
-                    data = fw._io.process_xor_many(section.data, key)
+                    print("Key index: {}".format(section.k_idx))
+                    deobfuscated = deobfuscate(section.data)
             elif fw.signature == "MTKW":
-                data = fw._io.process_xor_many(section.data, w_key)
+                deobfuscated = deobfuscate(section.data)
+            if deobfuscated:
+                data = deobfuscated
         open(filename, 'wb').write(data)
