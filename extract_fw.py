@@ -111,12 +111,17 @@ def deobfuscate(obfuscated, mode='consec'):
 
     ci_equals_ek_pi = set()
     ek_pi_to_pi = {}
-    for chunk_i in range(2, len(obfs_chunks) - 1):
+    for chunk_i in range(1, len(obfs_chunks) - 1):
         if obfs_chunks[chunk_i] == ek_zero:
             # The plaintext of the 2nd previous chunk is XORed with the
             # E_K(P_i) of the previous chunk.
             plaintext_i2 = xor(obfs_chunks[chunk_i - 1], ek_zero)
-            deobfs_chunks[chunk_i - 2] = plaintext_i2
+            if chunk_i == 1:
+                # The plaintext XORed with the 0th block of the encrypted data
+                # is actually the IV.
+                print("Found IV: {}".format(plaintext_i2.hex()))
+            else:
+                deobfs_chunks[chunk_i - 2] = plaintext_i2
 
             # Since we know the plaintext of the 2nd previous chunk, if we
             # know its C_i is equal to its E_K(P_i), add the C_i/E_K(P_i) to
