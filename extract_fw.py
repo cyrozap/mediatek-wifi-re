@@ -175,8 +175,10 @@ if __name__ == "__main__":
             deobfuscated = None
             if fw.signature == "MTKE":
                 if section.enc == 1:
-                    print("Key index: {}".format(section.k_idx))
+                    print("Section {} key index: {}".format(i, section.k_idx))
                     deobfuscated = deobfuscate(section.data)
+                else:
+                    print("Section {} is not encrypted.".format(i))
             elif fw.signature == "MTKW":
                 deobfuscated = deobfuscate(section.data)
             if deobfuscated:
