@@ -24,14 +24,14 @@ def xor(a, b):
         q[i] = (a[i] ^ b[i]) & 0xff
     return bytes(q)
 
-def bit_similarity(a):
+def bit_similarity(xored):
     '''Calculate the similarity of two byte arrays based on the result of their XOR.'''
 
-    a = bytes(a)
-    bitlen = len(a) * 8
+    xored = bytes(xored)
+    bitlen = len(xored) * 8
     ones = 0
-    for b in a:
-        ones += ONE_BITS[b]
+    for byte in xored:
+        ones += ONE_BITS[byte]
     return (bitlen - ones)/bitlen
 
 def find_ek_zero_consec(obfs_chunks):
