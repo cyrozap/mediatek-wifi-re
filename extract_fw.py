@@ -68,7 +68,7 @@ def find_ek_zero_consec(obfs_chunks):
 
     similarity = bit_similarity(xor(highest_chunk, bytes(bytearray(block_size))))
     if similarity > 0.80 or similarity < 0.20:
-        print("Warning: Likeliest E_K(zeroes) doesn't appear random. Are you sure your firmware is obfuscated?")
+        print("Warning: Likeliest E_K(zeroes) doesn't appear random. Are you sure this firmware is obfuscated?")
 
     return highest_chunk
 
