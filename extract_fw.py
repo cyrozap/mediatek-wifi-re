@@ -222,6 +222,7 @@ if __name__ == "__main__":
 
         filename = "{}.file_idx_{}.dest_addr_{:02X}.{}".format(basename, i, section.dest_addr, ext)
         data = section.data
+        open(filename, 'wb').write(data)
         if args.deobfsuscate:
             deobfuscated = None
             if fw.signature == "MTKE":
@@ -234,4 +235,5 @@ if __name__ == "__main__":
                 deobfuscated = deobfuscate(section.data)
             if deobfuscated:
                 data = deobfuscated
-        open(filename, 'wb').write(data)
+            filename = "{}.file_idx_{}.dest_addr_{:02X}.deobfs.{}".format(basename, i, section.dest_addr, ext)
+            open(filename, 'wb').write(data)
