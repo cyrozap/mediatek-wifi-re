@@ -182,6 +182,14 @@ def deobfuscate(obfuscated, mode='consec'):
                 if deobfs_chunks[next_chunk_i] != ek_zero:
                     ci_equals_ek_pi.add(next_chunk_i)
 
+    chunks_deobfuscated_successfully = 0
+    for chunk_i in range(chunk_count):
+        if deobfs_chunks[chunk_i] != obfs_chunks[chunk_i]:
+            chunks_deobfuscated_successfully += 1
+
+    print("Deobfuscated {} of {} blocks ({:.2f}%).".format(chunks_deobfuscated_successfully, chunk_count,
+        (100*chunks_deobfuscated_successfully)/chunk_count))
+
     return b''.join(deobfs_chunks)
 
 
