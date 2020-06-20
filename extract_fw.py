@@ -235,23 +235,56 @@ if __name__ == "__main__":
         print("CRC BAD: Expected 0x{:08x}, got 0x{:08x}.".format(firmware.crc, calculated_crc))
     else:
         print("CRC OK")
-    for i in range(len(firmware.fwdl_sections)):
-        section = firmware.fwdl_sections[i]
+    if fw.signature == "MTKE":
+        for i in range(len(firmware.fwdl_sections)):
+            section = firmware.fwdl_sections[i]
 
-        filename = "{}.file_idx_{}.dest_addr_{:02X}.{}".format(basename, i, section.dest_addr, ext)
-        data = section.data
-        open(filename, 'wb').write(data)
-        if args.deobfsuscate:
-            deobfuscated = None
-            if fw.signature == "MTKE":
+            filename = "{}.file_idx_{}.dest_addr_{:02X}.{}".format(basename, i, section.dest_addr, ext)
+            data = section.data
+            open(filename, 'wb').write(data)
+
+            if args.deobfsuscate:
+                deobfuscated = None
                 if section.enc == 1:
                     print("Section {} key index: {}".format(i, section.k_idx))
                     deobfuscated = deobfuscate(section.data)
                 else:
                     print("Section {} is not encrypted.".format(i))
-            elif fw.signature == "MTKW":
-                deobfuscated = deobfuscate(section.data)
-            if deobfuscated:
-                data = deobfuscated
-            filename = "{}.file_idx_{}.dest_addr_{:02X}.deobfs.{}".format(basename, i, section.dest_addr, ext)
+                if deobfuscated:
+                    data = deobfuscated
+                filename = "{}.file_idx_{}.dest_addr_{:02X}.deobfs.{}".format(basename, i, section.dest_addr, ext)
+                open(filename, 'wb').write(data)
+
+    elif fw.signature == "MTKW":
+        for i in range(len(firmware.fwdl_sections)):
+            section = firmware.fwdl_sections[i]
+            filename = "{}.file_idx_{}.dest_addr_{:02X}.{}".format(basename, i, section.dest_addr, ext)
+            data = section.data
             open(filename, 'wb').write(data)
+
+        if args.deobfsuscate:
+            # First, combine the data from each section into one big blob.
+            data_blobs = []
+            for i in range(len(firmware.fwdl_sections)):
+                section_data = firmware.fwdl_sections[i].data
+                data_blobs.append(section_data)
+
+                # Just to be safe, make sure the size is a multiple of the
+                # block size.
+                block_count = len(section_data) // 16
+                assert len(section_data) == block_count * 16
+            all_blobs = b''.join(data_blobs)
+
+            # Now we deobfuscate all the blobs together and split them
+            # afterwards.
+            deobfuscated = deobfuscate(all_blobs)
+            if deobfuscated:
+                offset = 0
+                for i in range(len(firmware.fwdl_sections)):
+                    section = firmware.fwdl_sections[i]
+                    section_len = len(section.data)
+                    data = deobfuscated[offset:offset+section_len]
+                    filename = "{}.file_idx_{}.dest_addr_{:02X}.deobfs.{}".format(basename, i, section.dest_addr, ext)
+                    open(filename, 'wb').write(data)
+                    offset += section_len
+                assert offset == len(all_blobs)
