@@ -66,10 +66,6 @@ def find_ek_zero_consec(obfs_chunks):
 
     print("Found likeliest E_K(zeroes) \"{}\" with longest run {}.".format(highest_chunk.hex(), highest))
 
-    similarity = bit_similarity(xor(highest_chunk, bytes(bytearray(block_size))))
-    if similarity > 0.80 or similarity < 0.20:
-        print("Warning: Likeliest E_K(zeroes) doesn't appear random. Are you sure this firmware is obfuscated?")
-
     return highest_chunk
 
 def find_ek_zero_freq(obfs_chunks):
@@ -108,6 +104,10 @@ def deobfuscate(obfuscated, mode='consec'):
 
     if not ek_zero:
         return None
+
+    similarity = bit_similarity(xor(ek_zero, bytes(bytearray(block_size))))
+    if similarity > 0.80 or similarity < 0.20:
+        print("Warning: Likeliest E_K(zeroes) doesn't appear random. Are you sure this firmware is obfuscated?")
 
     ci_equals_ek_pi = set()
     ek_pi_to_pi = {}
