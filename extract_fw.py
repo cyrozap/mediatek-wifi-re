@@ -182,6 +182,24 @@ def deobfuscate(obfuscated, mode='consec'):
                 if deobfs_chunks[next_chunk_i] != ek_zero:
                     ci_equals_ek_pi.add(next_chunk_i)
 
+    # Find other chunks with a known plaintext.
+    if ek_pi_to_pi:
+        print("Finding other known-plaintext blocks...")
+        for chunk_i in range(1, chunk_count):
+            second_prev_chunk_i = chunk_i - 2
+            prev_chunk_i = chunk_i - 1
+            curr_chunk_i = chunk_i
+            next_chunk_i = chunk_i + 1
+
+            if curr_chunk_i in ci_equals_ek_pi:
+                # This chunk has been decrypted already, so skip it.
+                continue
+
+            known_plaintext = ek_pi_to_pi.get(obfs_chunks[curr_chunk_i])
+            if known_plaintext:
+                print("Found one!")
+                deobfs_chunks[curr_chunk_i] = known_plaintext
+
     chunks_deobfuscated_successfully = 0
     for chunk_i in range(chunk_count):
         if deobfs_chunks[chunk_i] != obfs_chunks[chunk_i]:
