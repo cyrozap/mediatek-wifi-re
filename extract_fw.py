@@ -105,6 +105,10 @@ def deobfuscate(obfuscated, mode='consec'):
     if not ek_zero:
         return None
 
+    if ek_zero == bytes(bytearray(block_size)):
+        print("Error: Likeliest E_K(zeroes) is all zeros. This is extremely improbable, so it's almost certain that this firmware is not obfuscated.")
+        return obfuscated
+
     similarity = bit_similarity(xor(ek_zero, bytes(bytearray(block_size))))
     if similarity > 0.80 or similarity < 0.20:
         print("Warning: Likeliest E_K(zeroes) doesn't appear random. Are you sure this firmware is obfuscated?")
