@@ -129,7 +129,7 @@ def deobfuscate(obfuscated, mode='consec'):
             # all zeros.
             deobfs_chunks[curr_chunk_i] = bytes(bytearray(block_size))
 
-            # Beause a ciphertext block is equal to the XOR of its encripted
+            # Beause a ciphertext block is equal to the XOR of its encrypted
             # plaintext and the plaintext of the block that precedes it, and we
             # know that the ciphertext of the current block ("C_i") is equal to
             # a known encrypted block ("E_K(zeroes)"), that means the plaintext
