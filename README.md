@@ -1,5 +1,7 @@
 # MediaTek SoC WiFi RE
 
+Notes and utilities for reverse engineering the WiFi firmware used by modern
+MediaTek SoCs.
 
 ## Quick start
 
