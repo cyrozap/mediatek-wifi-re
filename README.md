@@ -1,7 +1,8 @@
-# MediaTek SoC WiFi RE
+# MediaTek WiFi RE
 
-Notes and utilities for reverse engineering the WiFi firmware used by modern
-MediaTek SoCs.
+Notes and utilities for reverse engineering the firmware used in MediaTek's
+WiFi cores. This includes the cores used in PCIe/USB/SDIO-attached chips,
+standalone WiFi microcontrollers, and SoCs with built-in WiFi.
 
 
 ## Quick start
