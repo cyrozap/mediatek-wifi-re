@@ -32,5 +32,5 @@
     that have the same function.
 
 
-[trm]: https://labs.mediatek.com/en/download/6OPabr6H
-[docs]: https://docs.labs.mediatek.com/resource/mt7687-mt7697/en/documentation
+[trm]: https://web.archive.org/web/20201101093239if_/https://labs.mediatek.com/en/download/6OPabr6H
+[docs]: https://web.archive.org/web/20210510020710/https://docs.labs.mediatek.com/resource/mt7687-mt7697/en/documentation
