@@ -30,7 +30,46 @@
     dedicated cryptography accelerator on the same bus and in this
     context it wouldn't make sense to include two pieces of hardware
     that have the same function.
+* Key bank is selectable. From the MT7697 TRM:
+  * N9 has EFUSEs.
+  * The crypto engine can have a key programmed into it from software
+    (stored in AES/DES key registers), or it can use a key directly from
+    one of two banks in the EFUSEs.
+  * Maybe the PDA behaves similarly, selecting a decryption key from
+    multiple key banks in the EFUSEs.
+    * Maybe the keys are different for each chip?
+    * ~~Need to determine if PDA of MT7697 can decrypt SoC WiFi
+      firmware.~~ This doesn't work--see below.
+    * Need to try to read the N9 EFUSEs.
+
+
+I did some experimenting with the [MT7697][mt7697] on the
+[LinkIt 7697][linkit]:
+
+* I couldn't get the PDA in the MT7697 to decrypt code for either the
+  MT6735 or MT6797.
+  * Maybe the keys that are selectable in the four keyslots are
+    SoC-family-specific or even SoC-class specific (e.g., "IoT" vs.
+    "smartphone/tablet").
+  * Maybe I messed up and tried decrypting the wrong data, resulting in
+    the garbled decryption output.
+    * I'll have to try this again with different input data, just to be
+      sure.
+* Trying to configure the PDA to operate on any data that isn't a
+  multiple of 16 bytes fails when done through the SDIO interface.
+  * Reconfiguring the PDA through its register interface enables sending
+    data in multiples of four bytes, but it still does its decryption
+    operation on blocks of 16 bytes.
+
+
+Important values:
+
+* IoT firmware `E_K(zeros)`: `1af02af42f0fb9677bba9808d797ffce`
+* SoC firmware `E_K(zeros)`: `b48d136fe376127cc5f91fb483e9d660`
+* SoC firmware IV: `00000000000000000000000000000000`
 
 
 [trm]: https://web.archive.org/web/20201101093239if_/https://labs.mediatek.com/en/download/6OPabr6H
 [docs]: https://web.archive.org/web/20210510020710/https://docs.labs.mediatek.com/resource/mt7687-mt7697/en/documentation
+[mt7697]: https://web.archive.org/web/20210927020259/https://labs.mediatek.com/en/chipset/MT7697
+[linkit]: https://web.archive.org/web/20210927020259/https://labs.mediatek.com/en/chipset/MT7697#HDK
